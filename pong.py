@@ -24,7 +24,7 @@ class Entity:
         self.vy = vy
 
     def draw(self, fbuf):
-        fbuf.fill_rect(int(self.x), int(self.y), self.w, self.h, 1)
+        fbuf.fill_rect(int(self.x), int(self.y), self.w, self.h, 1)     # draw rectangle at given location, size and color
 
 
 class Player(Entity):
@@ -80,14 +80,14 @@ while not game_over:
     ball.update(time.ticks_diff(ntick, tick) // 100, player)
     tick = ntick
     player.x = adc.read() * 58 / 255  # warum mal 58? (Erhöhung der Beschleunigung? Willkürlich gewählte Konstante?)
-    fbuf.fill(0)
+    fbuf.fill(0)    # Fill entire framebuf with specific color
     ball.draw(fbuf)
     player.draw(fbuf)
     spi.writeto(8, fbuf)
     time.sleep_ms(50)   # Adjust this for more performance boosts (Schätze damit kann man es schneller machen == Schwierigkeitsgrad)
 
 fbuf.fill(0)
-fbuf.text('GAME', 15, 8)
+fbuf.text('GAME', 15, 8)    # Write text to framebuf using coordinates as the upper-left corner of the text (color can be defined (standard value 1))
 fbuf.text('OVER', 15, 18)
 spi.writeto(8, fbuf)
 
