@@ -15,7 +15,13 @@ Das hier vorgestellte kleine Projekt soll die Verwendung von MicroPython auf han
 - diverse Kabel und Stecker aus Electronics Fun Kit (elegoo)
 
 #### PIN Zugehörigkeit:
- - Folgt -
-
-
-
+ESP8266		PmodOLEDrgb
+VCC-3.3 V ---   VCC (6)
+	  ---	VCCEN (9)
+	  ---	PMODEN (10)
+GND	  ---	GND (5)
+	  ---	CS (1)
+D5 (SCK)  ---	SCK (4)
+D8 (MOSI) ---	MOSI (2)
+D1 (GPIO) ---   D/C (7)
+D2 (GPIO) ---   RES (8)

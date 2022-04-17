@@ -1,28 +1,32 @@
-class Entity:
-    def __init__(self, x, y, w, h, vx, vy, screen_width, screen_heigth):
+from framebuf import FrameBuffer
+
+from disp_matrix import DispMatrix
+
+
+class _Entity:
+    def __init__(self, x: int, y: int, w: int, h: int, vx: int, vy: int):
         self.x = x
         self.y = y
         self.w = w
         self.h = h
         self.vx = vx
         self.vy = vy
-        self.screen_width = screen_width
-        self.screen_height = screen_heigth
 
-    def draw(self, fbuffer):
-        fbuffer.fill_rect(int(self.x), int(self.y), self.w, self.h,
-                          1)  # draw rectangle at given location, size and color
+    def draw(self, fbuf):
+        fbuf.fill_rect(int(self.x), int(self.y), self.w, self.h, 0xFFFF)  # White
 
 
-class Player(Entity):
+class Player(_Entity):
     pass
 
 
-class Ball(Entity):
-    def __init__(self, x, y, w, h, vx, vy, screen_width, screen_height):
-        super().__init__(x, y, w, h, vx, vy, screen_width, screen_height)  # Call constructor of inherited class
+class Ball(_Entity):
+    def __init__(self, x: int, y: int, w: int, h: int, vx: int, vy: int, screen_width: int, screen_height: int):
+        super().__init__(x, y, w, h, vx, vy)  # Call constructor of inherited class
         self.score = 0
         self.game_over = False
+        self.screen_width = screen_width
+        self.screen_height = screen_height
 
     def get_score(self):
         return self.score
@@ -30,7 +34,7 @@ class Ball(Entity):
     def get_game_over(self):
         return self.game_over
 
-    def update(self, dt, player):
+    def update(self, dt: int, player: Player):  # Not sure if 'int' is correct type of dt !?
         self.x += self.vx * dt
         if self.x <= 0:
             self.x = 0
@@ -39,7 +43,7 @@ class Ball(Entity):
         if self.x >= self.screen_width - self.w:
             self.x = self.screen_width - self.w
             self.vx = - self.vx
-
+        self.y += self.vy * dt
         if self.y <= 0:
             self.y = 0
             self.vy = -self.vy
