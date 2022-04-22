@@ -1,7 +1,8 @@
 # Seminar MicroPython
 
 #### Beschreibung:
-Das hier vorgestellte kleine Projekt soll die Verwendung von MicroPython auf handelsüblicher Hardware demonstrieren. Dabei ist mit relativ kleinem Aufwand bereits viel zu erreichen.
+Das
+hier vorgestellte kleine Projekt soll die Verwendung von MicroPython auf handelsüblicher Hardware demonstrieren. Gebaut wurde dabei das Spiel Pong. Auf Feinjustierung oder weitere Features wurde jedoch verzichtet.
 ---------
 #### Verwendete Software:
 - PyCharm 2021.3.3 (Community Edition), alternativ: Thonny
