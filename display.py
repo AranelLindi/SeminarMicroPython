@@ -1,10 +1,3 @@
-import time
-import sys
-import machine
-from machine import SPI, Pin
-
-from disp_matrix import DispMatrix
-
 import ustruct
 import utime
 from micropython import const
@@ -118,7 +111,7 @@ class PmodOLEDrgb:  # SSD1331-Display
     def __init__(self, spi, dc, rst=None, width=96, height=64):
         self.spi = spi
         self.dc = dc
-        #self.cs = cs
+        # self.cs = cs
         self.rst = rst
         self.width = width
         self.height = height
@@ -132,21 +125,21 @@ class PmodOLEDrgb:  # SSD1331-Display
             self.dc.value(1)
         else:
             self.dc.value(0)
-        #self.cs.value(0)
+        # self.cs.value(0)
         if command is not None:
             self.spi.write(bytearray([command]))
         if data is not None:
             self.spi.write(data)
-        #self.cs.value(1)
+        # self.cs.value(1)
 
     def _read(self, command=None, count=0):
         self.dc.value(0)
-        #self.cs.value(0)
+        # self.cs.value(0)
         if command is not None:
             self.spi.write(bytearray([command]))
         if count:
             data = self.spi.read(count)
-        #self.cs.value(1)
+        # self.cs.value(1)
         return data
 
     def pixel(self, x, y, color=None):
@@ -198,106 +191,3 @@ class PmodOLEDrgb:  # SSD1331-Display
         if not self.font is None:
             for c in txt:
                 x = self.putChar(x, y, c, color)
-
-
-if __name__ == "__main__":
-    from machine import Pin, SPI
-
-    spi = SPI(1, baudrate=10000000)
-    dc = Pin(5, Pin.OUT)
-    #cs = Pin(3, Pin.OUT)
-    oled = PmodOLEDrgb(spi=spi, dc=Pin(5))
-    oled.fill(0)
-
-    import framebuf
-
-    buffer = bytearray(oled.width * oled.height * 2)
-    fb = framebuf.FrameBuffer(buffer,
-                              oled.width,
-                              oled.height,
-                              framebuf.RGB565)
-
-    # test frame buffer
-    colors = []
-    for i in range(8):
-        r = (i & 1) * 255
-        g = ((i >> 1) & 1) * 255
-        b = ((i >> 2) & 1) * 255
-        colors.append(color565(r, g, b))
-
-    while True:
-        for color in colors:
-            fb.fill(color)
-            oled.block(0, 0, 96, 64, buffer)
-            utime.sleep(1)
-
-    # def draw_line(self, col_start: int, row_start: int, col_end: int, row_end: int, line_color: int):
-    #     # Check if coordinates out of range
-    #     if not (0 <= col_start <= self.screen_width) or not (0 <= col_end <= self.screen_width) or not (
-    #             0 <= row_start <= self.screen_height) or not (0 <= row_end <= self.screen_height):
-    #         return None
-    #
-    #     rgb_line = convert_16bits_to_rgb(line_color)
-    #
-    #     commands = bytearray(8)
-    #     commands[0] = 0x21
-    #     commands[1] = col_start
-    #     commands[2] = row_start
-    #     commands[3] = col_end
-    #     commands[4] = row_end
-    #     commands[5] = rgb_line[0]
-    #     commands[6] = rgb_line[1]
-    #     commands[7] = rgb_line[2]
-    #
-    #     self.spi.write(commands)
-    #     # self.spi.write(commands[0])  # Draw line # HIER IST NOCH NICHTS ABGEÄNDERT !!
-    #     # self.spi.write(bytearray(col_start))
-    #     # self.spi.write(row_start)
-    #     # self.spi.write(col_end))
-    #     # self.spi.write(row_end))
-    #
-    #     # self.spi.write(rgb_line[0].to_bytes(length=1, byteorder=sys.byteorder))  # red
-    #     # self.spi.write(rgb_line[1].to_bytes(length=1, byteorder=sys.byteorder))  # green
-    #     # self.spi.write(rgb_line[2].to_bytes(length=1, byteorder=sys.byteorder))  # blue
-    #
-    #
-    # def draw_rect(self, col_start: int, row_start: int, col_end: int, row_end: int, line_color: int, bfill: int,
-    #               fill_color: int):
-    #     # Check if coordinates out of range
-    #     if not (0 <= col_start <= self.screen_width) or not (0 <= col_end <= self.screen_width) or not (
-    #             0 <= row_start <= self.screen_height) or not (0 <= row_end <= self.screen_height):
-    #         return None
-    #
-    #     rgb_line = convert_16bits_to_rgb(line_color)
-    #     rgb_fill = convert_16bits_to_rgb(fill_color)
-    #
-    #     self.spi.write(b'0x26')  # Enable fill
-    #     if bfill:
-    #         self.spi.write(b'0x01')
-    #     else:
-    #         self.spi.write(b'0x00')
-    #
-    #     self.spi.write(b'0x22')  # Draw rectangle
-    #     self.spi.write(col_start.to_bytes(length=1, byteorder=sys.byteorder))
-    #     self.spi.write(row_start.to_bytes(length=1, byteorder=sys.byteorder))
-    #     self.spi.write(col_end.to_bytes(length=1, byteorder=sys.byteorder))
-    #     self.spi.write(row_end.to_bytes(length=1, byteorder=sys.byteorder))
-    #
-    #     self.spi.write(rgb_line[0].to_bytes(length=1, byteorder=sys.byteorder))  # red
-    #     self.spi.write(rgb_line[1].to_bytes(length=1, byteorder=sys.byteorder))  # green
-    #     self.spi.write(rgb_line[2].to_bytes(length=1, byteorder=sys.byteorder))  # blue
-    #
-    #     self.spi.write(rgb_fill[0].to_bytes(length=1, byteorder=sys.byteorder))  # red
-    #     self.spi.write(rgb_fill[1].to_bytes(length=1, byteorder=sys.byteorder))  # green
-    #     self.spi.write(rgb_fill[2].to_bytes(length=1, byteorder=sys.byteorder))  # blue
-    #
-    #
-    # def power_off_seq(self):
-    #     # 1. Turn the display off
-    #     self.spi.write(b'0xAE')
-    #     # 2. Bring Vcc Enable logic low
-    #     # self.vcc_en.value(0)
-    #     # 3. Delay 400 ms
-    #     time.sleep_ms(400)
-    #     # 4. Disconnect positive voltage supply to PmodOLEDrgb
-    #     # Done !

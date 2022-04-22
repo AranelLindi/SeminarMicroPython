@@ -1,9 +1,6 @@
-from framebuf import FrameBuffer
+# Provides objects that represent the game
 
-from disp_matrix import DispMatrix
-
-
-class _Entity:
+class _Entity:  # Private class
     def __init__(self, x: int, y: int, w: int, h: int, vx: int, vy: int):
         self.x = x
         self.y = y
@@ -34,7 +31,8 @@ class Ball(_Entity):
     def get_game_over(self):
         return self.game_over
 
-    def update(self, dt: int, player: Player):  # Not sure if 'int' is correct type of dt !?
+    # Checks whether ball is in contact with player platform or whether game is lost
+    def update(self, dt: int, player: Player):
         self.x += self.vx * dt
         if self.x <= 0:
             self.x = 0

@@ -2,59 +2,54 @@ import time
 
 import framebuf
 from machine import Pin, ADC, SPI
-from micropython import const
 
-from disp_matrix import DispMatrix
 from display import PmodOLEDrgb
 from obj import Ball, Player
 
-# Constants
+# Display size (constants)
 SCREEN_WIDTH = 96
 SCREEN_HEIGHT = 64
 
-spi = SPI(1, baudrate=6000000)
+# SPI initialization
+spi = SPI(1, baudrate=6000000)  # 6 MHz
 
+# Control pins for display
 dc = Pin(5, Pin.OUT)
 rst = Pin(4, Pin.OUT)
 
+# Display object initialization (includes Power-On-Sequence)
 disp = PmodOLEDrgb(spi, dc, rst)
 
-# Analog-Digital converter input (potentiometer)
-adc = ADC(0)  # 0 - 1 Volt ! An Vorwiderstand denken!
+# Analog-Digital converter input
+adc = ADC(0)  # Caution ! ADC should not have more than 1 volt !
 
+# Array which is storing next frame
 dispArr = bytearray(SCREEN_WIDTH * SCREEN_HEIGHT * 2)
 fbuf = framebuf.FrameBuffer(dispArr, SCREEN_WIDTH, SCREEN_HEIGHT, framebuf.RGB565)
-#fbuf.fill(0)
-
-# Display
-#disp = PmodOLEDrgb(spi, dc, vcc_en, pmod_en, rst, SCREEN_WIDTH, SCREEN_HEIGHT)
-
-#disp.power_on_seq()
-#disp.fill(0xF221)
 
 # Start conditions & positions
 ball = Ball(32, 16, 3, 3, 1, -1, SCREEN_WIDTH, SCREEN_HEIGHT)  # vx = 2; vx = -2
-player = Player(30, SCREEN_HEIGHT-3, 15, 2, 0, 0)
+player = Player(30, SCREEN_HEIGHT - 3, 15, 2, 0, 0)
 
-# Program
+# Required to calculate dt for first time
 tick = time.ticks_ms()
 
+# Execute loop as long as game isnt lost
 while not ball.get_game_over():
     ntick = time.ticks_ms()
     ball.update(time.ticks_diff(ntick, tick) // 100,
                 player)  # the floor division // rounds the result down to the nearest whole number
     tick = ntick
-    player.x = adc.read_u16() * (SCREEN_WIDTH-15) / 1023  # warum mal 58? (Erhöhung der Beschleunigung? Willkürlich gewählte Konstante?)
-    fbuf.fill(0)  # Fill entire framebuf with specific color
-    ball.draw(fbuf)
-    player.draw(fbuf)
-    disp.block(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, dispArr)
-    time.sleep_ms(50)
+    player.x = adc.read_u16() * (SCREEN_WIDTH - 15) / 1023
+    fbuf.fill(0)  # Fill entire framebuf with specific color (0 == black)
+    ball.draw(fbuf)  # Inserts current ball position into frame
+    player.draw(fbuf)  # Inserts current player platform position into frame
+    disp.block(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, dispArr)  # Sends current frame to display
+    time.sleep_ms(50)  # Waits for next iteration
 
+# Game is lost...
 fbuf.fill(0)
 fbuf.text('GAME', 15, 8)
 fbuf.text('OVER', 15, 18)
 disp.block(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, dispArr)
-print('Score: ', ball.get_score())
-
-## https://github.com/danjperron/pico_mpu6050_ssd1331/blob/088c6bf4d71450431ce284d1c346423a5e62747b/ssd1331.py#L107
+print('Score: ', ball.get_score())  # Score is sent through UART / USB
